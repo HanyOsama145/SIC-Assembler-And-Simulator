@@ -1,6 +1,6 @@
 # SIC Assembler & Memory Simulator
 
-A complete Two-Pass Assembler for the Simplified Instructional Computer (SIC) architecture, developed for the **Systems Programming (CC410)** course.
+A complete Two-Pass Assembler for the Simplified Instructional Computer (SIC) architecture.
 
 ## 🚀 Features
 - **Pass 1:** - Generates the Symbol Table.
@@ -12,5 +12,5 @@ A complete Two-Pass Assembler for the Simplified Instructional Computer (SIC) ar
 ## 🛠️ How to Build & Run
 1. **Compile the Assembler:**
    ```bash
-   g++ src/main.cpp -o sic_assembler
+   g++ src/sic.cpp -o sic_assembler
 
