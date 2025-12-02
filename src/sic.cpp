@@ -27,9 +27,11 @@ struct Line {
 };
 
 vector<Line> program;
+int startAddress = 0;
+int programLength = 0;
 void solve1()
 {
-    ifstream file("SIC.txt");
+    ifstream file("input/SIC.txt");
     string str,w1,w2,w3;
     int LOCCTR = 0;
     while(getline(file,str))
@@ -76,13 +78,17 @@ void solve1()
         }
         program.push_back(line);
     }
-
+    programLength = LOCCTR - startAddress;
 }
 
 void solve2()
 {
     for(auto&[address, label, opcode, operand, objectCode]:program)
     {
+        if(opcode == "START" or opcode == "END" or opcode == "RESW" or opcode == "RESB")
+        {
+            continue;
+        }
         if(mp1.count(opcode))
         {
             int add = 0;
@@ -100,24 +106,31 @@ void solve2()
             }
             stringstream ss;
             ss << mp1[opcode]<< setfill('0') << setw(4) << hex << uppercase << add;
-            opcode = ss.str();
+            objectCode = ss.str();
         }
-        else if (opcode =="WORD" or opcode == "BYTE")
+        else if (opcode == "WORD")
         {
-            if (opcode == "WORD") {
-                stringstream ss;
-                ss << setfill('0') << setw(6) << hex << stoi(operand);
-                objectCode = ss.str();
-            }
-            else if (operand[0]=='C')
+            stringstream ss;
+            ss << setfill('0') << setw(6) << hex << stoi(operand);
+            objectCode = ss.str();
+        }
+        else if (opcode == "BYTE")
+        {
+            string temp = "";
+            if (operand[0] == 'C')
             {
-                for(int i = 2 ;i<operand.size()-1;i++)
+                for(int i = 2; i < operand.size()-1; i++)
                 {
                     stringstream ss;
                     ss << hex << uppercase << (int)operand[i];
-                    objectCode += ss.str();
+                    temp += ss.str();
                 }
             }
+            else if (operand[0] == 'X')
+            {
+                temp = operand.substr(2, operand.size()-3);
+            }
+            objectCode = temp;
         }
     }
 }
@@ -127,6 +140,12 @@ int32_t main()
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
+    ifstream check("input/SIC.txt");
+    if(!check.good()) {
+        cout << "Error: Could not open input/SIC.txt" << endl;
+        return 0;
+    }
+    check.close();
     /*freopen("filename", "r", stdin);
     freopen("filename", "w", stdout);*/
 
@@ -137,13 +156,13 @@ int32_t main()
     //     solve();
     // }
     solve1();
-    cout<<"Finshed Pass 1\n";
-    for(auto& line : program)
-    {
-        cout << line.opcode;
-        if (!line.objectCode.empty()) cout << " " << line.objectCode;
-        cout << endl;
+
+    cout << "Symbol Table:\n";
+    cout << "----------------------\n";
+    for(auto& [i, j] : mp2) {
+        cout << left << setw(10) << i << hex << uppercase << j << endl;
     }
+    cout << "----------------------\n";
     solve2();
     // cout<<"Symbol Table:\n";
     // for(auto&[address, label, opcode, operand, objectCode]:program)
@@ -151,11 +170,5 @@ int32_t main()
     //     cout<<hex<<uppercase<<setfill('0')<<setw(4)<<address<<" "<<setw(8)<<label<<" "<<setw(8)<<opcode<<" "<<setw(8)<<operand<<" "<<objectCode<<endl;
     // }
     cout<<"Finshed Pass 2\n";
-     for(auto& line : program)
-    {
-        cout << line.opcode;
-        if (!line.objectCode.empty()) cout << " " << line.objectCode;
-        cout << endl;
-    }
     return 0;
 }
